@@ -3,17 +3,28 @@ var express = require('express');
 var cors = require('cors')
 const cookieParser = require('cookie-parser');
 const mongoose = require('./database/mongoose');
+const expressJwt = require('express-jwt');
+const JWT_SECRET = 'DFDKNDKJNFNEFKRNNIi#$$##LKFIVFNVKFNV';
+
+// require socket.io
+const io = require('socket.io')();
 
 var app = express();
 app.use(cors());
 
+// const checkIfAuthenticated = expressJwt.expressjwt({
+//   secret: JWT_SECRET
+// }); 
 var loginRouter = require('./routes/login');
 var signupRouter = require('./routes/signup');
+var dashboardRouter = require('./routes/dashboard')(io);
+
 
 app.use(cookieParser());
 app.use(express.json());
-app.use('/login', loginRouter);
+app.use('/login',  loginRouter);
 app.use('/signup', signupRouter);
+app.use('/dashboard' , dashboardRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -31,4 +42,4 @@ app.use(function(err, req, res, next) {
   res.send('no page found');
 });
 
-module.exports = app;
+module.exports = { app, io };
